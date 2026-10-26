@@ -483,7 +483,7 @@
 
         <!-- OPTION GOOGLE AGENDA AVEC CROIX ORANGE -->
         <div style="display:flex; align-items:center; justify-content:space-between; background:#f0fbfd; padding:6px 10px; border-radius:6px; margin-bottom:10px; border:1px solid var(--bord);">
-          <span style="font-size:0.75rem; font-weight:700; color:var(--c-nuit);" id="label-partage-ajout">Partager dans Google Agenda</span>
+          <span style="font-size:0.75rem; font-weight:700; color:var(--c-nuit);" id="label-partage-ajout">Ne pas partager</span>
           <button type="button" class="btn-croix-orange" id="btn-toggle-partage-ajout" title="Ne pas partager avec Google Agenda" onclick="togglePartageGoogle('ajout')">✖</button>
         </div>
 
@@ -571,7 +571,7 @@
 
         <!-- BOUTON CROIX ORANGE MODAL -->
         <div style="display:flex; align-items:center; justify-content:space-between; background:#f0fbfd; padding:4px 8px; border-radius:4px; margin-top:4px; border:1px solid var(--bord);">
-          <span style="font-size:0.72rem; font-weight:700; color:var(--c-nuit);" id="label-partage-modal">Partager dans Google Agenda</span>
+          <span style="font-size:0.72rem; font-weight:700; color:var(--c-nuit);" id="label-partage-modal">Ne pas partager</span>
           <button type="button" class="btn-croix-orange" id="btn-toggle-partage-modal" title="Ne pas partager avec Google Agenda" onclick="togglePartageGoogle('modal')">✖</button>
         </div>
       </div>
@@ -676,7 +676,7 @@
           btn.textContent = '✖';
           btn.style.background = 'var(--c-orange)';
           btn.title = 'Ne pas partager avec Google Agenda';
-          lbl.textContent = 'Partager dans Google Agenda';
+          lbl.textContent = 'Ne pas partager';
           lbl.style.color = 'var(--c-nuit)';
         } else {
           btn.textContent = '✔';
