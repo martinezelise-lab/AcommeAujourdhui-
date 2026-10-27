@@ -672,11 +672,10 @@
 
     // Mise en forme colorée sans crochets pour Raph, Mat, Nono
     function styliserNom(nom) {
-      if (nom === 'Nono') return '<span class="nom-nono">Nono</span>';
-      if (nom === 'Raph') return '<span class="nom-raph">Raph</span>';
-      if (nom === 'Mat') return '<span class="nom-mat">Mat</span>';
-      return '<b>' + echapperHTML(nom) + '</b>';
+      return '';
     }
+
+
 
     function togglePartageGoogle(vue) {
       if (vue === 'modal') {
