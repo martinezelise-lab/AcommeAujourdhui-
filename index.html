@@ -721,23 +721,11 @@
     function genererHTMLEvent(e, inclureHeure) {
       var html = '<div class="etiquette-event">';
       var heure = inclureHeure ? '<b>' + formaterHeureCompacte(e.time) + '</b> ' : '';
-      var listeQui = Array.isArray(e.qui) ? e.qui : [];
-
-      if (listeQui.length === 0) {
-        html += heure + echapperHTML(e.title);
-      } else if (listeQui.length === 1) {
-        // Un seul nom à côté de l'horaire
-        html += heure + styliserNom(listeQui[0]) + ' ' + echapperHTML(e.title);
-      } else {
-        // Premier prénom à côté de l'horaire, les suivants sur la ligne d'en-dessous
-        var premier = styliserNom(listeQui[0]);
-        var suivants = listeQui.slice(1).map(styliserNom).join(' ');
-        html += heure + premier + '<br>' + suivants + ' ' + echapperHTML(e.title);
-      }
-
+      html += heure + echapperHTML(e.title);
       html += '</div>';
-      return html;
-    }
+    return html;
+}
+
 
     function ajusterFinAutomatique(idStart, idEnd) {
       var startVal = document.getElementById(idStart).value;
