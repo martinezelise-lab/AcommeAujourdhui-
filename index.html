@@ -630,7 +630,7 @@
     const db = firebase.firestore();
 
     // Document ciblé dans Firestore
-    const AGENDA_DOC_ID = 'famille';
+    const AGENDA_DOC_ID = 'perso';
     const agendaRef = db.collection('agendas').doc(AGENDA_DOC_ID);
 
 
@@ -1438,7 +1438,7 @@
             actualiserAffichage();
           }
 
-          majStatutDrive('☁️ Synchronisé (Famille)', '#00e575');
+          majStatutDrive('☁️ Synchronisé (privé)', '#00e575');
         } else {
           // Premier lancement : initialise le document famille s'il n'existe pas encore
           save();
