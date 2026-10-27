@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- Bibliothèques Firebase pour Famille -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EMaJournal</title>
@@ -19,6 +24,10 @@
 
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
   <style>
     :root {
       --c-menthe: #00e575;
@@ -602,17 +611,28 @@
   </div>
 
   <script>
+        // ----------------------------------------------------
+    // CONFIGURATION FIREBASE (FAMILLE)
     // ----------------------------------------------------
-    // CONFIGURATION GOOGLE DRIVE
-    // ----------------------------------------------------
-    const CLIENT_ID = '1094375442883-83dltr80stt0o0tkd62lmut861fg7dro.apps.googleusercontent.com';
-    const SCOPE = 'https://www.googleapis.com/auth/drive.file';
-    const NOM_FICHIER_DRIVE = 'emajournal_data.json';
+    const firebaseConfig = {
+      apiKey: "AIzaSyC23W5lYlAHtup6cspWRQYBbdOcRAvauwo",
+      authDomain: "agendream.firebaseapp.com",
+      projectId: "agendream",
+      storageBucket: "agendream.firebasestorage.app",
+      messagingSenderId: "1094375442883",
+      appId: "1:1094375442883:web:4195ff39d818f7eaca9576"
+    };
 
-    let tokenClient = null;
-    let accessToken = null;
-    let driveFileId = null;
-    let timerRenouvellement = null;
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Document ciblé dans Firestore
+    const AGENDA_DOC_ID = 'famille';
+    const agendaRef = db.collection('agendas').doc(AGENDA_DOC_ID);
+
 
     var ABREV = ['D', 'L', 'Ma', 'Me', 'J', 'V', 'S'];
 
@@ -728,13 +748,24 @@
       document.getElementById(idEnd).value = String(hFin).padStart(2, '0') + ':' + parts[1];
     }
 
-    function save() {
-      if (accessToken && navigator.onLine) {
-        sauvegarderSurDrive();
-      } else if (!accessToken) {
-        majStatutDrive('⚠️ Non connecté à Drive (non enregistré)', '#ff1744');
+        function save() {
+      if (!auth.currentUser) {
+        majStatutDrive('⚠️ Non connecté (non enregistré)', '#ff1744');
+        return;
       }
+      
+      majStatutDrive('⏳ Sauvegarde...', '#ff9100');
+      
+      agendaRef.set(state)
+        .then(() => {
+          majStatutDrive('☁️ Synchronisé', '#00e575');
+        })
+        .catch((error) => {
+          console.error("Erreur de sauvegarde :", error);
+          majStatutDrive('⚠️ Erreur de sauvegarde', '#ff1744');
+        });
     }
+
 
     function getNumeroSemaine(d) {
       var date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1353,59 +1384,9 @@
     }
 
     // ----------------------------------------------------
-    // CONNEXION ET RECONNEXION SILENCIEUSE GOOGLE DRIVE
+        // ----------------------------------------------------
+    // AUTHENTIFICATION ET SYNCHRONISATION FIREBASE (FAMILLE)
     // ----------------------------------------------------
-    function initOAuth(callbackSuccess) {
-      try {
-        if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
-          tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID,
-            scope: SCOPE,
-            callback: async function(resp) {
-              if (resp.error) {
-                majStatutDrive('🔒 Non connecté à Google Drive', 'var(--c-nuit)');
-                document.getElementById('btn-auth').classList.remove('hidden');
-                document.getElementById('btn-sync').classList.add('hidden');
-                return;
-              }
-              accessToken = resp.access_token;
-              document.getElementById('btn-auth').classList.add('hidden');
-              document.getElementById('btn-sync').classList.remove('hidden');
-              majStatutDrive('Connecté à Google Drive', 'var(--c-cobalt)');
-
-              if (timerRenouvellement) clearTimeout(timerRenouvellement);
-              timerRenouvellement = setTimeout(tenterConnexionSilencieuse, 50 * 60 * 1000);
-
-              await chargerDepuisDrive();
-              if (callbackSuccess) callbackSuccess();
-            }
-          });
-        }
-      } catch(e) {
-        console.warn('Google Identity non prêt:', e);
-      }
-    }
-
-    function tenterConnexionSilencieuse() {
-      if (!tokenClient) initOAuth();
-      if (tokenClient) {
-        try {
-          tokenClient.requestAccessToken({ prompt: 'none' });
-        } catch(e) {
-          majStatutDrive('🔒 Non connecté à Google Drive', 'var(--c-nuit)');
-        }
-      }
-    }
-
-    function connecterDriveManuellement() {
-      if (!tokenClient) initOAuth();
-      if (!tokenClient) {
-        alert("Pensez à insérer votre Client ID dans le code source.");
-        return;
-      }
-      tokenClient.requestAccessToken({ prompt: '' });
-    }
-
     function majStatutDrive(texte, couleur) {
       var st = document.getElementById('sync-status');
       if (st) {
@@ -1414,105 +1395,72 @@
       }
     }
 
-    async function chercherFichierDrive() {
-      var q = encodeURIComponent("name = '" + NOM_FICHIER_DRIVE + "' and trashed = false");
-      var res = await fetch("https://www.googleapis.com/drive/v3/files?q=" + q, {
-        headers: { 'Authorization': 'Bearer ' + accessToken }
+    // Gestion de la connexion avec Google Firebase
+    function connecterDriveManuellement() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch((error) => {
+        console.error("Erreur de connexion :", error);
+        majStatutDrive('🔒 Erreur de connexion', '#ff1744');
       });
-      var data = await res.json();
-      return (data.files && data.files.length > 0) ? data.files[0].id : null;
     }
 
-    async function chargerDepuisDrive() {
-      if (!navigator.onLine || !accessToken) return;
-      majStatutDrive('Chargement Drive...', 'var(--c-orange)');
-      try {
-        driveFileId = await chercherFichierDrive();
-        if (driveFileId) {
-          var res = await fetch("https://www.googleapis.com/drive/v3/files/" + driveFileId + "?alt=media", {
-            headers: { 'Authorization': 'Bearer ' + accessToken }
-          });
-          var distantState = await res.json();
-          if (distantState && typeof distantState === 'object') {
-            state = distantState;
-            majJour();
+    // Écoute automatique de l'état de connexion (gère aussi la reconnexion silencieuse)
+    auth.onAuthStateChanged((user) => {
+      const btnAuth = document.getElementById('btn-auth');
+      const btnSync = document.getElementById('btn-sync');
+
+      if (user) {
+        if (btnAuth) btnAuth.classList.add('hidden');
+        if (btnSync) btnSync.classList.remove('hidden');
+        majStatutDrive('Connecté : ' + user.email, 'var(--c-cobalt)');
+        demarrerSynchronisationTempsReel();
+      } else {
+        if (btnAuth) btnAuth.classList.remove('hidden');
+        if (btnSync) btnSync.classList.add('hidden');
+        majStatutDrive('🔒 Non connecté', 'var(--c-nuit)');
+      }
+    });
+
+    // Écoute des données en temps réel : toute modification sur un appareil se reflète instantanément sur les autres
+    function demarrerSynchronisationTempsReel() {
+      majStatutDrive('Chargement...', 'var(--c-orange)');
+
+      agendaRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const donnees = doc.data();
+          // Met à jour l'état de l'application avec les données Firestore
+          Object.assign(state, donnees);
+
+          // Rafraîchit l'interface utilisateur existante
+          if (typeof renderAll === 'function') {
+            renderAll();
+          } else if (typeof actualiserAffichage === 'function') {
+            actualiserAffichage();
           }
+
+          majStatutDrive('☁️ Synchronisé (Famille)', '#00e575');
         } else {
-          await sauvegarderSurDrive();
+          // Premier lancement : initialise le document famille s'il n'existe pas encore
+          save();
         }
-        majStatutDrive('☁️ Synchronisé avec Google Drive', 'var(--c-menthe)');
-      } catch(e) {
-        majStatutDrive('Erreur de chargement', '#ff1744');
-      }
+      }, (error) => {
+        console.error("Erreur d'accès Firestore :", error);
+        if (error.code === 'permission-denied') {
+          majStatutDrive('⛔ Accès non autorisé pour ce compte', '#ff1744');
+        } else {
+          majStatutDrive('⚠️ Erreur de synchronisation', '#ff1744');
+        }
+      });
     }
 
-    async function sauvegarderSurDrive() {
-      if (!navigator.onLine || !accessToken) return;
-
-      majStatutDrive('Sauvegarde Drive...', 'var(--c-orange)');
-      var content = JSON.stringify(state);
-      var metadata = { name: NOM_FICHIER_DRIVE, mimeType: 'application/json' };
-
-      var boundary = '-------314159265358979323846';
-      var delimiter = "\r\n--" + boundary + "\r\n";
-      var closeDelim = "\r\n--" + boundary + "--";
-
-      var multipartRequestBody =
-        delimiter +
-        'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-        JSON.stringify(metadata) +
-        delimiter +
-        'Content-Type: application/json\r\n\r\n' +
-        content +
-        closeDelim;
-
-      try {
-        if (!driveFileId) driveFileId = await chercherFichierDrive();
-
-        var url = driveFileId
-          ? 'https://www.googleapis.com/upload/drive/v3/files/' + driveFileId + '?uploadType=multipart'
-          : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-        var methode = driveFileId ? 'PATCH' : 'POST';
-
-        var res = await fetch(url, {
-          method: methode,
-          headers: {
-            'Authorization': 'Bearer ' + accessToken,
-            'Content-Type': 'multipart/related; boundary=' + boundary
-          },
-          body: multipartRequestBody
-        });
-        var json = await res.json();
-        if (!driveFileId && json.id) driveFileId = json.id;
-
-        majStatutDrive('☁️ Synchronisé avec Google Drive', 'var(--c-menthe)');
-      } catch(e) {
-        majStatutDrive('Erreur sauvegarde', '#ff1744');
-      }
-    }
 
     // ----------------------------------------------------
-    // DÉMARRAGE ET CONNEXION TRANSPARENTE
+    // DÉMARRAGE ET CONNEXION TRANSPARENTE (FIREBASE)
     // ----------------------------------------------------
     window.addEventListener('load', function() {
       majJour();
-
-      var attenteGoogle = setInterval(function() {
-        if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
-          clearInterval(attenteGoogle);
-          initOAuth();
-          tenterConnexionSilencieuse();
-        }
-      }, 100);
-
-      document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible' && accessToken && navigator.onLine) {
-          chargerDepuisDrive();
-        } else if (document.visibilityState === 'visible' && !accessToken && navigator.onLine) {
-          tenterConnexionSilencieuse();
-        }
-      });
     });
+
   </script>
 </body>
 </html>
