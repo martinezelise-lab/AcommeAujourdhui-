@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <!-- Bibliothèques Firebase pour Famille -->
+  <!-- Bibliothèques Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -598,7 +598,7 @@
 
   <script>
         // ----------------------------------------------------
-    // CONFIGURATION FIREBASE (FAMILLE)
+    // CONFIGURATION FIREBASE (PERSO)
     // ----------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyC23W5lYlAHtup6cspWRQYBbdOcRAvauwo",
@@ -1344,7 +1344,7 @@
 
     // ----------------------------------------------------
         // ----------------------------------------------------
-    // AUTHENTIFICATION ET SYNCHRONISATION FIREBASE (FAMILLE)
+    // AUTHENTIFICATION ET SYNCHRONISATION FIREBASE (PERSO)
     // ----------------------------------------------------
     function majStatutDrive(texte, couleur) {
       var st = document.getElementById('sync-status');
@@ -1399,7 +1399,7 @@
 
           majStatutDrive('☁️ Synchronisé (privé)', '#00e575');
         } else {
-          // Premier lancement : initialise le document famille s'il n'existe pas encore
+          // Premier lancement : initialise le document s'il n'existe pas encore
           save();
         }
       }, (error) => {
