@@ -1030,14 +1030,6 @@
       document.getElementById('modal-box').classList.add('hidden');
     }
 
-    function recupererSelectionQui(prefixe) {
-      var arr = [];
-      ['raph', 'mat', 'nono'].forEach(function(p) {
-        var chk = document.getElementById(prefixe + p);
-        if (chk && chk.checked) arr.push(chk.value);
-      });
-      return arr;
-    }
 
     function validerModal() {
       var r = document.querySelector('input[name="col-haut"]:checked');
@@ -1049,7 +1041,8 @@
       var newTend = document.getElementById('mod-time-end').value;
       var newTit = document.getElementById('mod-text').value.trim();
       var newNotif = document.getElementById('mod-notif').value;
-      var newQui = recupererSelectionQui('mod-qui-');
+      var newQui = [];
+
 
       if (!newT) {
         newT = (curH >= 0 && curH <= 23) ? String(curH).padStart(2, '0') + ':00' : '09:00';
