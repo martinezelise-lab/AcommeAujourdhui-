@@ -682,23 +682,23 @@
 
 
       <!-- BLOC EN VRAC -->
-  <div class="bloc vrac-container">
-    <div class="vrac-header">
-      <span class="vrac-title">En vrac</span>
-    </div>
-    
-    <div class="vrac-input-group">
-      <input 
-        type="text" 
-        id="nouvelle-tache-vrac" 
-        placeholder="Ajouter une tâche en vrac..." 
-        onkeydown="if(event.key === 'Enter') { event.preventDefault(); ajouterTacheVrac(); }"
-      >
-      <button type="button" class="vrac-btn-add" onclick="ajouterTacheVrac()">+</button>
-    </div>
-  
-    <ul id="liste-en-vrac" class="vrac-list"></ul>
-  </div>
+      <div class="bloc vrac-container">
+        <div class="vrac-header">
+          <span class="vrac-title">En vrac</span>
+        </div>
+        
+        <div class="vrac-input-group">
+          <input 
+            type="text" 
+            id="nouvelle-tache-vrac" 
+            placeholder="Ajouter une tâche en vrac..." 
+            onkeydown="if(event.key === 'Enter') { event.preventDefault(); ajouterTacheVrac(); }"
+          >
+          <button type="button" class="vrac-btn-add" onclick="ajouterTacheVrac()">+</button>
+        </div>
+      
+        <ul id="liste-en-vrac" class="vrac-list"></ul>
+      </div>
     </section>
 
   </main>
