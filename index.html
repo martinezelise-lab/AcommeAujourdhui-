@@ -552,6 +552,123 @@
         <label style="font-size: 0.72rem; font-weight: 700;">Intitulé :</label>
         <textarea id="mod-text" rows="3" style="width: 100%; padding: 5px; margin: 2px 0 6px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.8rem; resize: vertical;"></textarea>
 
+        <!-- BLOC EN VRAC AVEC CASES À COCHER -->
+        <style>
+          .card-vrac {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: var(--bg-card, #ffffff);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.08);
+          }
+          .vrac-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+          }
+          .vrac-input-group input {
+            flex: 1;
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.95rem;
+            outline: none;
+          }
+          .vrac-input-group button {
+            background: #00838f; /* Bleu canard */
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1rem;
+            font-weight: 600;
+            cursor: pointer;
+          }
+          .vrac-liste {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+          .vrac-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+          }
+          /* Case à cocher personnalisée */
+          .vrac-checkbox {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 6px;
+            background-color: #00e5ff; /* Bleu turquoise non cochée */
+            border: 2px solid #00b4d8;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, border-color 0.2s;
+          }
+          .vrac-checkbox::after {
+            content: '';
+            display: none;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) translate(-1px, -1px);
+          }
+          /* Style de la case cochée */
+          .vrac-item.completed .vrac-checkbox {
+            background-color: #00838f; /* Bleu canard */
+            border-color: #006064;
+          }
+          .vrac-item.completed .vrac-checkbox::after {
+            display: block;
+          }
+          .vrac-item-text {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #1e293b;
+            word-break: break-word;
+          }
+          .vrac-item.completed .vrac-item-text {
+            text-decoration: line-through;
+            color: #94a3b8;
+          }
+          .vrac-delete-btn {
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0 4px;
+          }
+          .vrac-delete-btn:hover {
+            color: #ef4444;
+          }
+        </style>
+        
+        <div class="card-vrac">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: var(--c-nuit, #1e293b);">📌 En vrac</h3>
+            <span id="statut-vrac" style="font-size: 0.8rem; color: #64748b;"></span>
+          </div>
+        
+          <div class="vrac-input-group">
+            <input type="text" id="nouvelle-tache-vrac" placeholder="..." onkeydown="if(event.key === 'Enter') ajouterTacheVrac()">
+            <button type="button" onclick="ajouterTacheVrac()">Ajouter</button>
+          </div>
+        
+          <ul id="liste-en-vrac" class="vrac-liste"></ul>
+        </div>
+        
         <!-- NOTIFICATION TYPE GOOGLE AGENDA -->
         <label style="font-size: 0.72rem; font-weight: 700;">Notification :</label>
         <select id="mod-notif" class="select-notif" style="margin: 2px 0 6px;">
@@ -1397,7 +1514,8 @@
           if (typeof renderAll === 'function') {
             renderAll();
           }
-
+          actualiserAffichageVrac();
+          
           majStatutDrive('☁️ Synchronisé (privé)', '#00e575');
         } else {
           // Premier lancement : initialise le document s'il n'existe pas encore
@@ -1413,12 +1531,125 @@
       });
     }
 
+    // --- GESTION DU BLOC EN VRAC ---
+
+// Récupère la clé du mois actuel (ex: "2026-11")
+function obtenirCleMoisActuel() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+// Nettoyage mensuel : archive les tâches cochées des mois passés sans les effacer
+function verifierArchivageMensuelVrac() {
+  if (!state.tachesVrac || !Array.isArray(state.tachesVrac)) return;
+
+  const moisCourant = obtenirCleMoisActuel();
+  let modifie = false;
+
+  state.tachesVrac.forEach(tache => {
+    // Si la tâche est cochée et n'appartient pas au mois en cours
+    if (tache.fait && !tache.archive) {
+      const moisTache = (tache.dateFait || tache.dateCreation || '').substring(0, 7);
+      if (moisTache && moisTache < moisCourant) {
+        tache.archive = true; // Archivée : reste en base mais plus affichée
+        modifie = true;
+      }
+    }
+  });
+
+  if (modifie && typeof save === 'function') {
+    save();
+  }
+}
+
+// Ajoute une nouvelle tâche
+function ajouterTacheVrac() {
+  const input = document.getElementById('nouvelle-tache-vrac');
+  if (!input) return;
+  const texte = input.value.trim();
+  if (!texte) return;
+
+  if (!state.tachesVrac) state.tachesVrac = [];
+
+  const nouvelleTache = {
+    id: 'vrac_' + Date.now(),
+    texte: texte,
+    fait: false,
+    archive: false,
+    dateCreation: new Date().toISOString()
+  };
+
+  // Ajout en haut des tâches non faites
+  state.tachesVrac.unshift(nouvelleTache);
+  input.value = '';
+
+  actualiserAffichageVrac();
+  if (typeof save === 'function') save();
+}
+
+// Coche / décoche une tâche et réordonne la liste
+function basculerTacheVrac(id) {
+  if (!state.tachesVrac) return;
+
+  const tache = state.tachesVrac.find(t => t.id === id);
+  if (!tache) return;
+
+  tache.fait = !tache.fait;
+  if (tache.fait) {
+    tache.dateFait = new Date().toISOString();
+  } else {
+    delete tache.dateFait;
+  }
+
+  // Tri automatique : non cochées en premier, cochées à la fin
+  state.tachesVrac.sort((a, b) => {
+    if (a.fait === b.fait) return 0;
+    return a.fait ? 1 : -1;
+  });
+
+  actualiserAffichageVrac();
+  if (typeof save === 'function') save();
+}
+
+// Suppression manuelle si besoin
+function supprimerTacheVrac(id, event) {
+  event.stopPropagation();
+  if (!state.tachesVrac) return;
+  state.tachesVrac = state.tachesVrac.filter(t => t.id !== id);
+  actualiserAffichageVrac();
+  if (typeof save === 'function') save();
+}
+
+// Affiche la liste à l'écran (filtre les éléments archivés)
+function actualiserAffichageVrac() {
+  const container = document.getElementById('liste-en-vrac');
+  if (!container || typeof state === 'undefined') return;
+
+  verifierArchivageMensuelVrac();
+
+  container.innerHTML = '';
+  const elementsActifs = (state.tachesVrac || []).filter(t => !t.archive);
+
+  elementsActifs.forEach(tache => {
+    const li = document.createElement('li');
+    li.className = 'vrac-item' + (tache.fait ? ' completed' : '');
+
+    li.innerHTML = `
+      <div class="vrac-checkbox" onclick="basculerTacheVrac('${tache.id}')"></div>
+      <span class="vrac-item-text" onclick="basculerTacheVrac('${tache.id}')">${tache.texte}</span>
+      <button type="button" class="vrac-delete-btn" onclick="supprimerTacheVrac('${tache.id}', event)" title="Supprimer">×</button>
+    `;
+
+    container.appendChild(li);
+  });
+}
 
     // ----------------------------------------------------
     // DÉMARRAGE ET CONNEXION TRANSPARENTE (FIREBASE)
     // ----------------------------------------------------
     window.addEventListener('load', function() {
       majJour();
+      actualiserAffichageVrac();
     });
 
   </script>
