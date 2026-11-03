@@ -375,9 +375,115 @@
       width: 16px;
       height: 16px;
     }
+
+    /* Bloc en vrac */
+     .card-vrac {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: var(--bg-card, #ffffff);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.08);
+          }
+          .vrac-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+          }
+          .vrac-input-group input {
+            flex: 1;
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.95rem;
+            outline: none;
+          }
+          .vrac-input-group button {
+            background: #00838f; /* Bleu canard */
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1rem;
+            font-weight: 600;
+            cursor: pointer;
+          }
+          .vrac-liste {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+          .vrac-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+          }
+          /* Case à cocher personnalisée */
+          .vrac-checkbox {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 6px;
+            background-color: #00e5ff; /* Bleu turquoise non cochée */
+            border: 2px solid #00b4d8;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, border-color 0.2s;
+          }
+          .vrac-checkbox::after {
+            content: '';
+            display: none;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) translate(-1px, -1px);
+          }
+          /* Style de la case cochée */
+          .vrac-item.completed .vrac-checkbox {
+            background-color: #00838f; /* Bleu canard */
+            border-color: #006064;
+          }
+          .vrac-item.completed .vrac-checkbox::after {
+            display: block;
+          }
+          .vrac-item-text {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #1e293b;
+            word-break: break-word;
+          }
+          .vrac-item.completed .vrac-item-text {
+            text-decoration: line-through;
+            color: #94a3b8;
+          }
+          .vrac-delete-btn {
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0 4px;
+          }
+          .vrac-delete-btn:hover {
+            color: #ef4444;
+          }
   </style>
 </head>
 <body>
+
+<!-- ======================================================================= -->
+<!-- ======================= 🚩 DÉBUT HTML ======================= -->
+<!-- ======================================================================= -->
+        
 
   <!-- ONGLETS HAUT -->
   <nav id="top-nav">
@@ -529,11 +635,9 @@
           </div>
         </div>
 
-        
-
         <label style="font-size: 0.8rem; font-weight: 700;">Intitulé :</label>
         <textarea id="add-tit" rows="3" style="width: 100%; padding: 6px; margin: 3px 0 8px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.85rem; resize: vertical;"></textarea>
-        
+
       <!-- NOTIFICATION TYPE GOOGLE AGENDA (AJOUT) -->
         <label style="font-size: 0.8rem; font-weight: 700;">Notification :</label>
         <div class="notif-dropdown-wrapper" style="margin: 3px 0 8px;">
@@ -575,6 +679,26 @@
 
         <button type="button" class="btn btn-bleu" style="width: 100%;" onclick="ajouterEventForm()">Ajouter</button>
       </div>
+
+
+      <!-- BLOC EN VRAC -->
+  <div class="bloc vrac-container">
+    <div class="vrac-header">
+      <span class="vrac-title">En vrac</span>
+    </div>
+    
+    <div class="vrac-input-group">
+      <input 
+        type="text" 
+        id="nouvelle-tache-vrac" 
+        placeholder="Ajouter une tâche en vrac..." 
+        onkeydown="if(event.key === 'Enter') { event.preventDefault(); ajouterTacheVrac(); }"
+      >
+      <button type="button" class="vrac-btn-add" onclick="ajouterTacheVrac()">+</button>
+    </div>
+  
+    <ul id="liste-en-vrac" class="vrac-list"></ul>
+  </div>
     </section>
 
   </main>
@@ -634,114 +758,7 @@
 
         <label style="font-size: 0.72rem; font-weight: 700;">Intitulé :</label>
         <textarea id="mod-text" rows="3" style="width: 100%; padding: 5px; margin: 2px 0 6px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.8rem; resize: vertical;"></textarea>
-
-        <!-- BLOC EN VRAC AVEC CASES À COCHER -->
-        <style>
-          .card-vrac {
-            margin-top: 1.5rem;
-            padding: 1.25rem;
-            background: var(--bg-card, #ffffff);
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.08);
-          }
-          .vrac-input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-          }
-          .vrac-input-group input {
-            flex: 1;
-            padding: 0.65rem 0.85rem;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            font-size: 0.95rem;
-            outline: none;
-          }
-          .vrac-input-group button {
-            background: #00838f; /* Bleu canard */
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            padding: 0 1rem;
-            font-weight: 600;
-            cursor: pointer;
-          }
-          .vrac-liste {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-          .vrac-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.6rem 0.75rem;
-            background: #f8fafc;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-          }
-          /* Case à cocher personnalisée */
-          .vrac-checkbox {
-            width: 22px;
-            height: 22px;
-            min-width: 22px;
-            border-radius: 6px;
-            background-color: #00e5ff; /* Bleu turquoise non cochée */
-            border: 2px solid #00b4d8;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s, border-color 0.2s;
-          }
-          .vrac-checkbox::after {
-            content: '';
-            display: none;
-            width: 5px;
-            height: 9px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg) translate(-1px, -1px);
-          }
-          /* Style de la case cochée */
-          .vrac-item.completed .vrac-checkbox {
-            background-color: #00838f; /* Bleu canard */
-            border-color: #006064;
-          }
-          .vrac-item.completed .vrac-checkbox::after {
-            display: block;
-          }
-          .vrac-item-text {
-            flex: 1;
-            font-size: 0.95rem;
-            color: #1e293b;
-            word-break: break-word;
-          }
-          .vrac-item.completed .vrac-item-text {
-            text-decoration: line-through;
-            color: #94a3b8;
-          }
-          .vrac-delete-btn {
-            background: none;
-            border: none;
-            color: #cbd5e1;
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 0 4px;
-          }
-          .vrac-delete-btn:hover {
-            color: #ef4444;
-          }
-        </style>
-
-<!-- ======================================================================= -->
-<!-- ======================= 🚩 DÉBUT HTML ======================= -->
-<!-- ======================================================================= -->
-        
+       
         <div class="card-vrac">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
             <h3 style="margin: 0; font-size: 1.1rem; color: var(--c-nuit, #1e293b);">📌 En vrac</h3>
@@ -822,24 +839,7 @@
     </div>
   </div>
 
-  <!-- BLOC EN VRAC -->
-  <div class="bloc vrac-container">
-    <div class="vrac-header">
-      <span class="vrac-title">📝 En vrac</span>
-    </div>
-    
-    <div class="vrac-input-group">
-      <input 
-        type="text" 
-        id="nouvelle-tache-vrac" 
-        placeholder="Ajouter une tâche en vrac..." 
-        onkeydown="if(event.key === 'Enter') { event.preventDefault(); ajouterTacheVrac(); }"
-      >
-      <button type="button" class="vrac-btn-add" onclick="ajouterTacheVrac()">+</button>
-    </div>
   
-    <ul id="liste-en-vrac" class="vrac-list"></ul>
-  </div>
 
   <!-- ======================= 🏁 FIN DU CONTENU HTML ========================= -->
 <!-- ======================================================================= -->
