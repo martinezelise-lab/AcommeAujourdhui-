@@ -29,6 +29,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   
   <style>
+
+  /* ======================================================================= */
+/* ========================== 🎨 STYLES DEBUT CSS ============================== */
+/* ======================================================================= */
     :root {
       --c-menthe: #00e575;
       --c-turquoise: #00e5c9;
@@ -732,6 +736,10 @@
             color: #ef4444;
           }
         </style>
+
+<!-- ======================================================================= -->
+<!-- ======================= 🚩 DÉBUT HTML ======================= -->
+<!-- ======================================================================= -->
         
         <div class="card-vrac">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
@@ -812,6 +820,34 @@
       </div>
     </div>
   </div>
+
+  <!-- BLOC EN VRAC -->
+  <div class="vrac-container">
+    <div class="vrac-header">
+      <span class="vrac-title">📝 En vrac</span>
+    </div>
+    
+    <div class="vrac-input-group">
+      <input 
+        type="text" 
+        id="nouvelle-tache-vrac" 
+        placeholder="Ajouter une tâche en vrac..." 
+        onkeydown="if(event.key === 'Enter') { event.preventDefault(); ajouterTacheVrac(); }"
+      >
+      <button type="button" class="vrac-btn-add" onclick="ajouterTacheVrac()">+</button>
+    </div>
+  
+    <ul id="liste-en-vrac" class="vrac-list"></ul>
+  </div>
+
+  <!-- ======================= 🏁 FIN DU CONTENU HTML ========================= -->
+<!-- ======================================================================= -->
+
+
+  
+// =======================================================================
+// ======================== ⚙️ DEBUT JAVASCRIPT =========================
+// =======================================================================
 
   <script>
         // ----------------------------------------------------
@@ -1640,41 +1676,6 @@
 function obtenirCleMoisActuel() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-}
-// Met à jour le libellé du menu déroulant selon les cases cochées
-function majTexteNotif(type) {
-  const checkboxes = document.querySelectorAll(`input[name="notif-${type}-delai"]:checked`);
-  const label = document.getElementById(`label-${type}-notif`);
-  if (!label) return;
-
-  if (checkboxes.length === 0) {
-    label.textContent = "Aucune";
-  } else if (checkboxes.length === 1) {
-    label.textContent = checkboxes[0].nextElementSibling.textContent;
-  } else {
-    label.textContent = `${checkboxes.length} rappels choisis`;
-  }
-}
-
-// Renvoie un tableau des durées cochées en minutes (ex: [1440, 60] ou [])
-function obtenirNotifs(type) {
-  const checkboxes = document.querySelectorAll(`input[name="notif-${type}-delai"]:checked`);
-  return Array.from(checkboxes).map(cb => parseInt(cb.value, 10));
-}
-
-// Coche ou décoche les cases selon les données stockées
-function definirNotifs(type, valeurs) {
-  let tabValeurs = [];
-  if (Array.isArray(valeurs)) {
-    tabValeurs = valeurs.map(String);
-  } else if (valeurs && valeurs !== 'none') {
-    tabValeurs = [String(valeurs)];
-  }
-
-  document.querySelectorAll(`input[name="notif-${type}-delai"]`).forEach(cb => {
-    cb.checked = tabValeurs.includes(cb.value);
-  });
-  majTexteNotif(type);
 }
     
 // Met à jour le libellé du menu déroulant selon les cases cochées
