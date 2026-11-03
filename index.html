@@ -314,6 +314,63 @@
     .qui-label {
       display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
     }
+
+    /* Déroulant notifications à cases à cocher */
+    .notif-dropdown-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .notif-details {
+      position: relative;
+      width: 100%;
+    }
+    .notif-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 0.85rem;
+      color: #1e293b;
+      cursor: pointer;
+      list-style: none;
+    }
+    .notif-summary::-webkit-details-marker {
+      display: none;
+    }
+    .notif-menu-options {
+      position: absolute;
+      top: calc(100% + 3px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      max-height: 190px;
+      overflow-y: auto;
+      z-index: 1000;
+      padding: 4px 0;
+    }
+    .notif-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: #334155;
+    }
+    .notif-option:hover {
+      background: #f1f5f9;
+    }
+    .notif-option input[type="checkbox"] {
+      accent-color: #00838f;
+      width: 16px;
+      height: 16px;
+    }
   </style>
 </head>
 <body>
@@ -472,17 +529,38 @@
         <label style="font-size: 0.8rem; font-weight: 700;">Intitulé :</label>
         <textarea id="add-tit" rows="3" style="width: 100%; padding: 6px; margin: 3px 0 8px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.85rem; resize: vertical;"></textarea>
         
-        <!-- NOTIFICATION TYPE GOOGLE AGENDA -->
+      <!-- NOTIFICATION TYPE GOOGLE AGENDA (AJOUT) -->
         <label style="font-size: 0.8rem; font-weight: 700;">Notification :</label>
-        <select id="add-notif" class="select-notif" style="margin: 3px 0 8px;">
-          <option value="none">Aucune</option>
-          <option value="5">5 minutes avant</option>
-          <option value="10" selected>10 minutes avant</option>
-          <option value="15">15 minutes avant</option>
-          <option value="30">30 minutes avant</option>
-          <option value="60">1 heure avant</option>
-          <option value="1440">1 jour avant</option>
-        </select>
+        <div class="notif-dropdown-wrapper" style="margin: 3px 0 8px;">
+          <details id="details-add-notif" class="notif-details">
+            <summary class="notif-summary">
+              <span id="label-add-notif">Aucune</span>
+              <span class="fleche-menu">▾</span>
+            </summary>
+            <div class="notif-menu-options">
+              <label class="notif-option">
+                <input type="checkbox" name="notif-add-delai" value="1440" onchange="majTexteNotif('add')">
+                <span>1 jour avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-add-delai" value="180" onchange="majTexteNotif('add')">
+                <span>3 heures avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-add-delai" value="60" onchange="majTexteNotif('add')">
+                <span>1 heure avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-add-delai" value="30" onchange="majTexteNotif('add')">
+                <span>30 minutes avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-add-delai" value="15" onchange="majTexteNotif('add')">
+                <span>15 minutes avant</span>
+              </label>
+            </div>
+          </details>
+        </div>
 
         <!-- OPTION GOOGLE AGENDA AVEC CROIX ORANGE -->
         <div style="display:flex; align-items:center; justify-content:space-between; background:#f0fbfd; padding:6px 10px; border-radius:6px; margin-bottom:10px; border:1px solid var(--bord);">
@@ -669,17 +747,39 @@
           <ul id="liste-en-vrac" class="vrac-liste"></ul>
         </div>
         
-        <!-- NOTIFICATION TYPE GOOGLE AGENDA -->
-        <label style="font-size: 0.72rem; font-weight: 700;">Notification :</label>
-        <select id="mod-notif" class="select-notif" style="margin: 2px 0 6px;">
-          <option value="none">Aucune</option>
-          <option value="5">5 minutes avant</option>
-          <option value="10" selected>10 minutes avant</option>
-          <option value="15">15 minutes avant</option>
-          <option value="30">30 minutes avant</option>
-          <option value="60">1 heure avant</option>
-          <option value="1440">1 jour avant</option>
-        </select>
+       
+        <!-- NOTIFICATION TYPE GOOGLE AGENDA (MODIFICATION) -->
+        <label style="font-size: 0.8rem; font-weight: 700;">Notification :</label>
+        <div class="notif-dropdown-wrapper" style="margin: 3px 0 8px;">
+          <details id="details-mod-notif" class="notif-details">
+            <summary class="notif-summary">
+              <span id="label-mod-notif">Aucune</span>
+              <span class="fleche-menu">▾</span>
+            </summary>
+            <div class="notif-menu-options">
+              <label class="notif-option">
+                <input type="checkbox" name="notif-mod-delai" value="1440" onchange="majTexteNotif('mod')">
+                <span>1 jour avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-mod-delai" value="180" onchange="majTexteNotif('mod')">
+                <span>3 heures avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-mod-delai" value="60" onchange="majTexteNotif('mod')">
+                <span>1 heure avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-mod-delai" value="30" onchange="majTexteNotif('mod')">
+                <span>30 minutes avant</span>
+              </label>
+              <label class="notif-option">
+                <input type="checkbox" name="notif-mod-delai" value="15" onchange="majTexteNotif('mod')">
+                <span>15 minutes avant</span>
+              </label>
+            </div>
+          </details>
+        </div>
 
         <!-- BOUTON CROIX ORANGE MODAL -->
         <div style="display:flex; align-items:center; justify-content:space-between; background:#f0fbfd; padding:4px 8px; border-radius:4px; margin-top:4px; border:1px solid var(--bord);">
@@ -1056,7 +1156,7 @@
       document.getElementById('mod-time').value = defaultH;
       document.getElementById('mod-time-end').value = defaultFinH;
       document.getElementById('mod-text').value = '';
-      document.getElementById('mod-notif').value = '10';
+      definirNotifs('mod', ev.notif);
 
       partageActifModal = true;
       majVisuelBoutonPartage('btn-toggle-partage-modal', 'label-partage-modal', true);
@@ -1145,7 +1245,8 @@
       var newT = document.getElementById('mod-time').value;
       var newTend = document.getElementById('mod-time-end').value;
       var newTit = document.getElementById('mod-text').value.trim();
-      var newNotif = document.getElementById('mod-notif').value;
+      var notifsModifiees = obtenirNotifs('mod');
+      var newNotif = notifsModifiees.length > 0 ? notifsModifiees[0] : 'none';
       var newQui = [];
 
 
@@ -1424,7 +1525,8 @@
       var t = document.getElementById('add-t').value;
       var tend = document.getElementById('add-t-end').value;
       var tit = document.getElementById('add-tit').value.trim();
-      var notif = document.getElementById('add-notif').value;
+      var notifsChoisies = obtenirNotifs('add');
+      var notif = notifsChoisies.length > 0 ? notifsChoisies[0] : 'none';
             var qui = [];
 
       if (!d || !tit) return alert('Merci d\'indiquer au moins la date et l\'intitulé.');
@@ -1455,6 +1557,7 @@
 
       save();
       document.getElementById('add-tit').value = '';
+      definirNotifs('add', []);
       dateActuelle = new Date(d);
       allerOnglet('jour');
     }
@@ -1538,7 +1641,77 @@ function obtenirCleMoisActuel() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 }
+// Met à jour le libellé du menu déroulant selon les cases cochées
+function majTexteNotif(type) {
+  const checkboxes = document.querySelectorAll(`input[name="notif-${type}-delai"]:checked`);
+  const label = document.getElementById(`label-${type}-notif`);
+  if (!label) return;
 
+  if (checkboxes.length === 0) {
+    label.textContent = "Aucune";
+  } else if (checkboxes.length === 1) {
+    label.textContent = checkboxes[0].nextElementSibling.textContent;
+  } else {
+    label.textContent = `${checkboxes.length} rappels choisis`;
+  }
+}
+
+// Renvoie un tableau des durées cochées en minutes (ex: [1440, 60] ou [])
+function obtenirNotifs(type) {
+  const checkboxes = document.querySelectorAll(`input[name="notif-${type}-delai"]:checked`);
+  return Array.from(checkboxes).map(cb => parseInt(cb.value, 10));
+}
+
+// Coche ou décoche les cases selon les données stockées
+function definirNotifs(type, valeurs) {
+  let tabValeurs = [];
+  if (Array.isArray(valeurs)) {
+    tabValeurs = valeurs.map(String);
+  } else if (valeurs && valeurs !== 'none') {
+    tabValeurs = [String(valeurs)];
+  }
+
+  document.querySelectorAll(`input[name="notif-${type}-delai"]`).forEach(cb => {
+    cb.checked = tabValeurs.includes(cb.value);
+  });
+  majTexteNotif(type);
+}
+    
+// Met à jour le libellé du menu déroulant selon les cases cochées
+function majTexteNotif(type) {
+  const checkboxes = document.querySelectorAll(`input[name="notif-${type}-delai"]:checked`);
+  const label = document.getElementById(`label-${type}-notif`);
+  if (!label) return;
+
+  if (checkboxes.length === 0) {
+    label.textContent = "Aucune";
+  } else if (checkboxes.length === 1) {
+    label.textContent = checkboxes[0].nextElementSibling.textContent;
+  } else {
+    label.textContent = `${checkboxes.length} rappels choisis`;
+  }
+}
+
+// Renvoie un tableau des durées cochées en minutes (ex: [1440, 60] ou [])
+function obtenirNotifs(type) {
+  const checkboxes = document.querySelectorAll(`input[name="notif-${type}-delai"]:checked`);
+  return Array.from(checkboxes).map(cb => parseInt(cb.value, 10));
+}
+
+// Coche ou décoche les cases selon les données stockées
+function definirNotifs(type, valeurs) {
+  let tabValeurs = [];
+  if (Array.isArray(valeurs)) {
+    tabValeurs = valeurs.map(String);
+  } else if (valeurs && valeurs !== 'none') {
+    tabValeurs = [String(valeurs)];
+  }
+
+  document.querySelectorAll(`input[name="notif-${type}-delai"]`).forEach(cb => {
+    cb.checked = tabValeurs.includes(cb.value);
+  });
+  majTexteNotif(type);
+}
 // Nettoyage mensuel : archive les tâches cochées des mois passés sans les effacer
 function verifierArchivageMensuelVrac() {
   if (!state.tachesVrac || !Array.isArray(state.tachesVrac)) return;
