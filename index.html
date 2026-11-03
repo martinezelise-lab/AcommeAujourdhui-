@@ -741,7 +741,7 @@
         </label>
       </div>
 
-      <!-- NOUVEL ÉVÉNEMENT -->
+      <!-- NOUVEL ÉVÉNEMENT / Modification -->
       <div style="background: #fdfdfd; border: 1px solid var(--bord); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
         <div style="font-size: 0.78rem; font-weight: 800; color: var(--c-cobalt); margin-bottom: 4px;">Ajouter un événement</div>
         
@@ -758,20 +758,8 @@
 
         <label style="font-size: 0.72rem; font-weight: 700;">Intitulé :</label>
         <textarea id="mod-text" rows="3" style="width: 100%; padding: 5px; margin: 2px 0 6px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.8rem; resize: vertical;"></textarea>
-       
-        <div class="card-vrac">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-            <h3 style="margin: 0; font-size: 1.1rem; color: var(--c-nuit, #1e293b);">📌 En vrac</h3>
-            <span id="statut-vrac" style="font-size: 0.8rem; color: #64748b;"></span>
-          </div>
+       </div>
         
-          <div class="vrac-input-group">
-            <input type="text" id="nouvelle-tache-vrac" placeholder="..." onkeydown="if(event.key === 'Enter') ajouterTacheVrac()">
-            <button type="button" onclick="ajouterTacheVrac()">Ajouter</button>
-          </div>
-        
-          <ul id="liste-en-vrac" class="vrac-liste"></ul>
-        </div>
         
        
         <!-- NOTIFICATION TYPE GOOGLE AGENDA (MODIFICATION) -->
