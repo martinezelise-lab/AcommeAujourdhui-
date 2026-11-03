@@ -705,8 +705,8 @@
 
   <!-- MODAL AU CLIC D'UNE CASE HORAIRE -->
   <div id="modal-box" class="modal hidden">
-    <div class="modal-box">
-      <h4 id="mod-titre" style="font-size: 0.95rem; color: var(--c-nuit); margin-bottom: 8px;">Créneau</h4>
+    <div class="modal-box" style="max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+      <h4 id="mod-titre" style="font-size: 0.95rem; color: var(--c-nuit); margin-bottom: 4px;">Créneau</h4>
 
       <!-- SÉLECTION COULEUR SANS NOM DE COULEUR -->
       <label style="font-size: 0.78rem; font-weight: 700;">Couleur :</label>
@@ -742,7 +742,7 @@
       </div>
 
       <!-- NOUVEL ÉVÉNEMENT / Modification -->
-      <div style="background: #fdfdfd; border: 1px solid var(--bord); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
+      <div style="background: #fdfdfd; border: 1px solid var(--bord); padding: 8px; border-radius: 6px;">
         <div style="font-size: 0.78rem; font-weight: 800; color: var(--c-cobalt); margin-bottom: 4px;">Ajouter un événement</div>
         
         <div style="display:flex; gap:6px;">
@@ -758,10 +758,7 @@
 
         <label style="font-size: 0.72rem; font-weight: 700;">Intitulé :</label>
         <textarea id="mod-text" rows="3" style="width: 100%; padding: 5px; margin: 2px 0 6px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.8rem; resize: vertical;"></textarea>
-       </div>
-        
-        
-       
+
         <!-- NOTIFICATION TYPE GOOGLE AGENDA (MODIFICATION) -->
         <label style="font-size: 0.8rem; font-weight: 700;">Notification :</label>
         <div class="notif-dropdown-wrapper" style="margin: 3px 0 8px;">
@@ -802,11 +799,13 @@
         </div>
       </div>
 
+      <!-- DÉJÀ PRÉVU (Bien séparé sous le formulaire) -->
       <div id="zone-events-existants" class="hidden">
         <div style="font-size: 0.78rem; font-weight: 800; color: var(--c-nuit); margin-bottom: 4px;">Déjà prévu</div>
         <div id="liste-events-existants-box"></div>
       </div>
 
+      <!-- BOUTONS D'ACTION DU BAS -->
       <div style="display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px;">
         <button type="button" class="btn btn-gris" onclick="fermerModal()">Fermer</button>
         <button type="button" class="btn btn-bleu" onclick="validerModal()">Enregistrer</button>
