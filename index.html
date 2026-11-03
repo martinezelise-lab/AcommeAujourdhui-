@@ -1175,45 +1175,62 @@
       curH = h;
       var iso = toISO(dateActuelle);
       curSlotKey = iso + '_' + h;
-
-      document.getElementById('mod-titre').textContent = 'Créneau : ' + nom;
+    
+      // 1. Titre du créneau
+      var modTitre = document.getElementById('mod-titre');
+      if (modTitre) modTitre.textContent = 'Créneau : ' + nom;
       
+      // 2. Calcul des heures de début et fin par défaut
       var defaultH = (h >= 0 && h <= 23) ? String(h).padStart(2, '0') + ':00' : '09:00';
       var defaultFinH = (h >= 0 && h <= 23) ? String((h + 1) % 24).padStart(2, '0') + ':00' : '10:00';
-
-      document.getElementById('mod-time').value = defaultH;
-      document.getElementById('mod-time-end').value = defaultFinH;
-      document.getElementById('mod-text').value = '';
-      definirNotifs('mod', ev.notif);
-
+    
+      var modTime = document.getElementById('mod-time');
+      if (modTime) modTime.value = defaultH;
+    
+      var modTimeEnd = document.getElementById('mod-time-end');
+      if (modTimeEnd) modTimeEnd.value = defaultFinH;
+    
+      var modText = document.getElementById('mod-text');
+      if (modText) modText.value = '';
+    
+      // 3. Réinitialisation des notifications (décochées par défaut, affichage "Aucune")
+      if (typeof definirNotifs === 'function') {
+        definirNotifs('mod', '');
+      }
+    
+      // 4. État du bouton de partage Google Agenda
       partageActifModal = true;
-      majVisuelBoutonPartage('btn-toggle-partage-modal', 'label-partage-modal', true);
-
-      var c = state.slotColors[curSlotKey] || '';
+      if (typeof majVisuelBoutonPartage === 'function') {
+        majVisuelBoutonPartage('btn-toggle-partage-modal', 'label-partage-modal', true);
+      }
+    
+      // 5. Couleur du créneau
+      var c = (state.slotColors && state.slotColors[curSlotKey]) || '';
       document.querySelectorAll('input[name="col-haut"]').forEach(function(r) {
         r.checked = (r.value === c);
       });
-
+    
+      // 6. Filtrage et affichage des événements existants sur ce créneau
       var evsCreneau = getEvents(iso).filter(function(e) {
         var hh = parseInt(e.time.split(':')[0], 10);
         return (h === -1 && hh < 6) || (h === 24 && hh > 23) || (h === hh);
       });
-
+    
       var zoneExist = document.getElementById('zone-events-existants');
       var boxExist = document.getElementById('liste-events-existants-box');
-      boxExist.innerHTML = '';
-
-      if (evsCreneau.length > 0) {
+      if (boxExist) boxExist.innerHTML = '';
+    
+      if (evsCreneau.length > 0 && zoneExist && boxExist) {
         zoneExist.classList.remove('hidden');
         evsCreneau.forEach(function(ev) {
           var div = document.createElement('div');
           div.className = 'item-existant-creneau';
-
+    
           var quiEv = Array.isArray(ev.qui) ? ev.qui : [];
           var chkRaph = quiEv.indexOf('Raph') !== -1 ? 'checked' : '';
           var chkMat = quiEv.indexOf('Mat') !== -1 ? 'checked' : '';
           var chkNono = quiEv.indexOf('Nono') !== -1 ? 'checked' : '';
-
+    
           div.innerHTML = `
             <div style="display:flex; gap:4px; align-items:center;">
               <input type="time" value="${echapperHTML(ev.time)}" id="edit-t-${ev.id}" style="padding:4px; border:1px solid var(--bord); border-radius:4px; font-size:0.75rem;">
@@ -1228,11 +1245,10 @@
             <div style="display:flex; gap:4px; align-items:center;">
               <select id="edit-notif-${ev.id}" class="select-notif" style="flex:1;">
                 <option value="none" ${ev.notif === 'none' ? 'selected' : ''}>Aucune notification</option>
-                <option value="5" ${ev.notif === '5' ? 'selected' : ''}>5 min avant</option>
-                <option value="10" ${(!ev.notif || ev.notif === '10') ? 'selected' : ''}>10 min avant</option>
                 <option value="15" ${ev.notif === '15' ? 'selected' : ''}>15 min avant</option>
                 <option value="30" ${ev.notif === '30' ? 'selected' : ''}>30 min avant</option>
                 <option value="60" ${ev.notif === '60' ? 'selected' : ''}>1 h avant</option>
+                <option value="180" ${ev.notif === '180' ? 'selected' : ''}>3 h avant</option>
                 <option value="1440" ${ev.notif === '1440' ? 'selected' : ''}>1 jour avant</option>
               </select>
             </div>
@@ -1242,21 +1258,25 @@
               <button type="button" class="btn-sm-fleche" id="btn-partage-existant-${ev.id}" title="Partager avec Google Agenda">➜</button>
             </div>
           `;
-
+    
           var btnFleche = div.querySelector('#btn-partage-existant-' + ev.id);
           if (btnFleche) {
             btnFleche.addEventListener('click', function() {
               ouvrirGoogleAgenda(ev);
             });
           }
-
+    
           boxExist.appendChild(div);
         });
-      } else {
+      } else if (zoneExist) {
         zoneExist.classList.add('hidden');
       }
-
-      document.getElementById('modal-box').classList.remove('hidden');
+    
+      // 7. Affichage effectif de la modale
+      var modal = document.getElementById('modal-box');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
     }
 
     function fermerModal() {
