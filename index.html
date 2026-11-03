@@ -682,19 +682,19 @@
 
 
       <!-- BLOC EN VRAC -->
-      <div class="bloc vrac-container">
-        <div class="vrac-header">
-          <span class="vrac-title">En vrac</span>
-        </div>
+      <!-- BLOC EN VRAC -->
+      <div class="bloc vrac-container" style="margin-top: 15px;">
+        <h3 style="color: var(--c-nuit); margin-bottom: 8px;">En vrac</h3>
         
-        <div class="vrac-input-group">
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
           <input 
             type="text" 
             id="nouvelle-tache-vrac" 
             placeholder="Ajouter une tâche en vrac..." 
+            style="flex: 1; padding: 6px; border: 1.5px solid var(--bord); border-radius: 4px; font-family: sans-serif; font-size: 0.85rem;"
             onkeydown="if(event.key === 'Enter') { event.preventDefault(); ajouterTacheVrac(); }"
           >
-          <button type="button" class="vrac-btn-add" onclick="ajouterTacheVrac()">+</button>
+          <button type="button" class="btn btn-bleu" onclick="ajouterTacheVrac()">Ajouter</button>
         </div>
       
         <ul id="liste-en-vrac" class="vrac-list"></ul>
