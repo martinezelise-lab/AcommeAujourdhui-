@@ -1391,10 +1391,11 @@
           Object.assign(state, donnees);
 
           // Rafraîchit l'interface utilisateur existante
+          if (typeof majJour === 'function') {
+            majJour();
+          }
           if (typeof renderAll === 'function') {
             renderAll();
-          } else if (typeof actualiserAffichage === 'function') {
-            actualiserAffichage();
           }
 
           majStatutDrive('☁️ Synchronisé (privé)', '#00e575');
